@@ -16,7 +16,7 @@ STATIC_DIR = "static"
 IMAGES_DIR = os.path.join(STATIC_DIR, "images")
 
 # JWT Configuration
-SECRET_KEY = "your-secret-key-here-change-in-production"
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -49,7 +49,11 @@ app = FastAPI(title="BI Dashboard Portal API")
 # Permite que Angular se comunique con este backend.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"], # Solo permite peticiones desde Angular en desarrollo
+    allow_origins=[
+        "http://localhost:4200",  # Development
+        "https://*.azurewebsites.net",  # Azure App Service
+        os.getenv("FRONTEND_URL", "http://localhost:4200")  # Production URL
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
