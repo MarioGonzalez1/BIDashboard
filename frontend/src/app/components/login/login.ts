@@ -14,7 +14,6 @@ export class LoginComponent {
   loginForm: FormGroup;
   isLoading = false;
   errorMessage = '';
-  showRegister = false;
 
   constructor(
     private fb: FormBuilder,
@@ -33,36 +32,16 @@ export class LoginComponent {
       
       const credentials = this.loginForm.value;
       
-      if (this.showRegister) {
-        this.authService.register(credentials).subscribe({
-          next: (response) => {
-            alert('Registration successful! Please login.');
-            this.showRegister = false;
-            this.isLoading = false;
-          },
-          error: (error) => {
-            this.errorMessage = error.error?.detail || 'Registration failed';
-            this.isLoading = false;
-          }
-        });
-      } else {
-        this.authService.login(credentials).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            window.location.reload();
-          },
-          error: (error) => {
-            this.errorMessage = error.error?.detail || 'Login failed';
-            this.isLoading = false;
-          }
-        });
-      }
+      this.authService.login(credentials).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          window.location.reload();
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.detail || 'Invalid username or password';
+          this.isLoading = false;
+        }
+      });
     }
-  }
-
-  toggleMode(): void {
-    this.showRegister = !this.showRegister;
-    this.errorMessage = '';
-    this.loginForm.reset();
   }
 }

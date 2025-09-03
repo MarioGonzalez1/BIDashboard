@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { DashboardService, IDashboard } from './services/dashboard';
 import { AuthService } from './services/auth';
+import { SystemService, SystemStats, RecentUpdate, FeaturedDashboard } from './services/system';
 import { DashboardCardComponent } from './components/dashboard-card/dashboard-card';
 import { AddDashboardFormComponent } from './components/add-dashboard-form/add-dashboard-form';
 import { LoginComponent } from './components/login/login';
@@ -17,25 +18,39 @@ export class App implements OnInit {
   filteredDashboards: IDashboard[] = [];
   currentFilter: string = 'getting-started';
   showAddForm: boolean = false;
+  showAddModal: boolean = false;
   isAuthenticated: boolean = false;
+  isAdmin: boolean = false;
   dashboardToEdit: IDashboard | null = null;
   workshopExpanded: boolean = false;
   hrExpanded: boolean = false;
   totalDashboards: number = 0;
-  activeUsers: number = 127;
-  recentUpdates: number = 8;
+  activeUsers: number = 0;
+  recentUpdates: RecentUpdate[] = [];
+  featuredDashboards: FeaturedDashboard[] = [];
+  departments: number = 0;
   showRequestModal: boolean = false;
+  biTeamExpanded: boolean = false;
 
+  // Force Angular recompilation
   constructor(
     private dashboardService: DashboardService,
-    private authService: AuthService
+    private authService: AuthService,
+    private systemService: SystemService
   ) {}
 
   ngOnInit() {
+    // Load user info on startup if token exists
+    this.authService.loadUserInfoOnInit();
+    
     this.authService.isAuthenticated().subscribe(isAuth => {
       this.isAuthenticated = isAuth;
       if (isAuth) {
+        this.isAdmin = this.authService.isAdmin();
         this.loadDashboards();
+        this.loadSystemData();
+      } else {
+        this.isAdmin = false;
       }
     });
   }
@@ -53,6 +68,34 @@ export class App implements OnInit {
           this.authService.logout();
         }
       }
+    });
+  }
+
+  loadSystemData() {
+    // Load system statistics
+    this.systemService.getSystemStats().subscribe({
+      next: stats => {
+        this.totalDashboards = stats.total_dashboards;
+        this.activeUsers = stats.active_users;
+        this.departments = stats.departments;
+      },
+      error: error => console.error('Error loading system stats:', error)
+    });
+
+    // Load recent updates
+    this.systemService.getRecentUpdates().subscribe({
+      next: updates => {
+        this.recentUpdates = updates;
+      },
+      error: error => console.error('Error loading recent updates:', error)
+    });
+
+    // Load featured dashboards
+    this.systemService.getFeaturedDashboards().subscribe({
+      next: featured => {
+        this.featuredDashboards = featured;
+      },
+      error: error => console.error('Error loading featured dashboards:', error)
     });
   }
 
@@ -91,13 +134,14 @@ export class App implements OnInit {
   
   onDashboardAdded() {
     this.showAddForm = false;
+    this.showAddModal = false;
     this.dashboardToEdit = null;
     this.loadDashboards();
   }
 
   onEditDashboard(dashboard: IDashboard) {
     this.dashboardToEdit = dashboard;
-    this.showAddForm = true;
+    this.showAddModal = true;
   }
 
   onDeleteDashboard(dashboardId: number) {
@@ -118,4 +162,9 @@ export class App implements OnInit {
   logout() {
     this.authService.logout();
   }
+
+  toggleBiTeam() {
+    this.biTeamExpanded = !this.biTeamExpanded;
+  }
+
 }

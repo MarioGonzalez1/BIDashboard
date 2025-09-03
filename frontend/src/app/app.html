@@ -29,7 +29,9 @@
         </ul>
       </nav>
       <div class="add-button-container">
-        <button (click)="showAddForm = !showAddForm">+ Add Dashboard</button>
+        @if (isAdmin) {
+          <button (click)="showAddModal = true">+ Add Dashboard</button>
+        }
         <button (click)="logout()" class="logout-btn">Logout</button>
       </div>
     </aside>
@@ -48,10 +50,15 @@
           </div>
           
           <div class="bi-team-section">
-            <h2>Meet Your BI Team</h2>
+            <div class="section-header" (click)="toggleBiTeam()">
+              <h2>Meet Your BI Team</h2>
+              <button class="expand-btn" [class.expanded]="biTeamExpanded">
+                <span class="expand-icon">{{ biTeamExpanded ? '▼' : '▶' }}</span>
+              </button>
+            </div>
             <p>Our dedicated Business Intelligence team is here to help you make data-driven decisions. Contact us for dashboard requests, training, or analytics support.</p>
             
-            <div class="team-cards">
+            <div class="team-cards" *ngIf="biTeamExpanded">
               <div class="team-card">
                 <div class="team-photo">
                   <img src="/Martin.jpg" alt="Martin Alejandro Martinez Rodea" />
@@ -112,7 +119,7 @@
                 <div class="stat-label">Total Dashboards</div>
               </div>
               <div class="stat-card">
-                <div class="stat-number">6</div>
+                <div class="stat-number">{{ departments }}</div>
                 <div class="stat-label">Departments</div>
               </div>
               <div class="stat-card">
@@ -120,7 +127,7 @@
                 <div class="stat-label">Active Users</div>
               </div>
               <div class="stat-card">
-                <div class="stat-number">{{ recentUpdates }}</div>
+                <div class="stat-number">{{ recentUpdates.length }}</div>
                 <div class="stat-label">Recent Updates</div>
               </div>
             </div>
@@ -129,39 +136,40 @@
           <div class="recent-updates-section">
             <h2>Recent Updates</h2>
             <div class="updates-list">
-              <div class="update-item">
-                <div class="update-date">Dec 15, 2024</div>
-                <div class="update-content">New Operations Performance dashboard added to Operations department</div>
-              </div>
-              <div class="update-item">
-                <div class="update-date">Dec 10, 2024</div>
-                <div class="update-content">HR Analytics dashboard updated with new metrics</div>
-              </div>
-              <div class="update-item">
-                <div class="update-date">Dec 5, 2024</div>
-                <div class="update-content">Workshop Maintenance dashboard enhanced with real-time data</div>
-              </div>
+              @if (recentUpdates.length > 0) {
+                @for (update of recentUpdates; track update.titulo) {
+                  <div class="update-item">
+                    <div class="update-date">{{ update.created_date | date:'MMM d, y' }}</div>
+                    <div class="update-content">{{ update.titulo }} added to {{ update.categoria }} department</div>
+                  </div>
+                }
+              } @else {
+                <div class="update-item">
+                  <div class="update-date">-</div>
+                  <div class="update-content">No recent updates available</div>
+                </div>
+              }
             </div>
           </div>
           
           <div class="featured-dashboards-section">
             <h2>Featured Dashboards</h2>
             <div class="featured-grid">
-              <div class="featured-item">
-                <div class="featured-category">Operations</div>
-                <div class="featured-title">Fleet Performance Overview</div>
-                <div class="featured-description">Real-time vehicle tracking and performance metrics</div>
-              </div>
-              <div class="featured-item">
-                <div class="featured-category">Finance</div>
-                <div class="featured-title">Revenue Analytics</div>
-                <div class="featured-description">Comprehensive revenue analysis and forecasting</div>
-              </div>
-              <div class="featured-item">
-                <div class="featured-category">Workshop</div>
-                <div class="featured-title">Maintenance Schedule</div>
-                <div class="featured-description">Vehicle maintenance tracking and scheduling</div>
-              </div>
+              @if (featuredDashboards.length > 0) {
+                @for (dashboard of featuredDashboards; track dashboard.id) {
+                  <div class="featured-item">
+                    <div class="featured-category">{{ dashboard.categoria }}</div>
+                    <div class="featured-title">{{ dashboard.titulo }}</div>
+                    <div class="featured-description">{{ dashboard.descripcion || 'Dashboard for ' + dashboard.categoria + ' department' }}</div>
+                  </div>
+                }
+              } @else {
+                <div class="featured-item">
+                  <div class="featured-category">System</div>
+                  <div class="featured-title">No Featured Dashboards</div>
+                  <div class="featured-description">Add dashboards to see featured content here</div>
+                </div>
+              }
             </div>
           </div>
           
@@ -232,12 +240,6 @@
           }
         </div>
       }
-      @if (showAddForm) {
-        <app-add-dashboard-form 
-          [dashboardToEdit]="dashboardToEdit"
-          (dashboardAdded)="onDashboardAdded()">
-        </app-add-dashboard-form>
-      }
     </main>
   </div>
   
@@ -303,6 +305,25 @@
             <span class="help-icon">💡</span>
             Our team will review your request and contact you for any clarifications needed
           </p>
+        </div>
+      </div>
+    </div>
+  }
+  
+  <!-- Add Dashboard Modal -->
+  @if (showAddModal && isAdmin) {
+    <div class="modal-overlay" (click)="showAddModal = false">
+      <div class="modal-content add-dashboard-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>+ Add New Dashboard</h2>
+          <button class="close-btn" (click)="showAddModal = false">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <app-add-dashboard-form 
+            [dashboardToEdit]="dashboardToEdit"
+            (dashboardAdded)="onDashboardAdded()">
+          </app-add-dashboard-form>
         </div>
       </div>
     </div>

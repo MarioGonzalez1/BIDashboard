@@ -17,7 +17,11 @@ export interface LoginResponse {
 
 export interface UserInfo {
   username: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
   is_admin: boolean;
+  is_active: boolean;
 }
 
 @Injectable({
@@ -35,14 +39,9 @@ export class AuthService {
       .pipe(
         tap(response => {
           localStorage.setItem(this.tokenKey, response.access_token);
-          // Decode JWT to get user info
-          const payload = this.decodeJWT(response.access_token);
-          const userInfo: UserInfo = {
-            username: payload.sub,
-            is_admin: payload.sub === 'admin' // Simple check, could be improved
-          };
-          localStorage.setItem(this.userInfoKey, JSON.stringify(userInfo));
           this.isAuthenticatedSubject.next(true);
+          // Fetch user info from /api/me endpoint
+          this.fetchUserInfo().subscribe();
         })
       );
   }
@@ -77,6 +76,36 @@ export class AuthService {
   isAdmin(): boolean {
     const user = this.getCurrentUser();
     return user ? user.is_admin : false;
+  }
+  
+  fetchUserInfo(): Observable<UserInfo> {
+    console.log('🔍 Fetching user info from /api/me...');
+    return this.http.get<UserInfo>(`${API_URL}/api/me`)
+      .pipe(
+        tap(userInfo => {
+          console.log('✅ User info received:', userInfo);
+          localStorage.setItem(this.userInfoKey, JSON.stringify(userInfo));
+        })
+      );
+  }
+  
+  loadUserInfoOnInit(): void {
+    if (this.hasToken()) {
+      console.log('🔄 Loading user info on init...');
+      this.fetchUserInfo().subscribe({
+        next: () => {
+          console.log('✅ User info loaded successfully');
+          this.isAuthenticatedSubject.next(true);
+        },
+        error: (error) => {
+          console.error('❌ Error loading user info:', error);
+          // Token might be expired or invalid
+          this.logout();
+        }
+      });
+    } else {
+      console.log('🚫 No token found');
+    }
   }
   
   decodeJWT(token: string): any {

@@ -13,6 +13,9 @@ from sqlalchemy.orm import Session
 from database_config import get_db, DATABASE_INFO
 from database_adapter import adapter
 
+# Import the User model
+User = adapter.User
+
 # --- CONFIGURACIÓN ---
 STATIC_DIR = "static"
 IMAGES_DIR = os.path.join(STATIC_DIR, "images")
@@ -153,6 +156,24 @@ async def login(user_login: UserLogin, db: Session = Depends(get_db)):
         data={"sub": user.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/api/me")
+async def get_current_user_info(current_user = Depends(get_current_user)):
+    """Get current logged-in user information"""
+    fields = adapter.get_user_field_mapping()
+    user_info = {
+        "username": getattr(current_user, fields['username']),
+        "email": getattr(current_user, fields['email'], None),
+        "first_name": getattr(current_user, fields['first_name'], None),
+        "last_name": getattr(current_user, fields['last_name'], None),
+        "is_admin": getattr(current_user, fields['is_admin'], False),
+        "is_active": getattr(current_user, fields['is_active'], True),
+    }
+    print(f"🔐 /api/me endpoint called for user: {user_info['username']}")
+    print(f"👤 User info: {user_info}")
+    print(f"📋 Fields mapping: {fields}")
+    print(f"🔍 Raw user object attributes: {[attr for attr in dir(current_user) if not attr.startswith('_')]}")
+    return user_info
 
 @app.post("/api/register")
 async def register(user_login: UserLogin, db: Session = Depends(get_db)):
@@ -316,6 +337,99 @@ def delete_tablero(
     db.commit()
     
     return {"message": "Dashboard deleted successfully"}
+
+# --- SYSTEM STATISTICS ENDPOINTS ---
+@app.get("/api/system/stats")
+def get_system_statistics(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get system overview statistics"""
+    dashboard_data = adapter.get_all_dashboards(db)
+    
+    # Count dashboards by category
+    category_counts = {}
+    total_dashboards = len(dashboard_data)
+    
+    for item in dashboard_data:
+        category_name = item.get('category_name', 'Unknown')
+        category_counts[category_name] = category_counts.get(category_name, 0) + 1
+    
+    # Count active users
+    active_users = db.query(adapter.User).filter(
+        getattr(adapter.User, adapter.get_user_field_mapping()['is_active']) == True
+    ).count()
+    
+    # Count departments (unique categories)
+    departments = len(set(category_counts.keys()))
+    
+    return {
+        "total_dashboards": total_dashboards,
+        "active_users": active_users,
+        "departments": departments,
+        "category_counts": category_counts
+    }
+
+@app.get("/api/system/recent-updates")
+def get_recent_updates(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get recent dashboard updates"""
+    dashboard_data = adapter.get_all_dashboards(db)
+    dashboard_fields = adapter.get_dashboard_field_mapping()
+    
+    # Get all dashboards and add them to recent updates
+    recent_dashboards = []
+    for item in dashboard_data:
+        dashboard = item['dashboard']
+        category_name = item.get('category_name', 'Unknown')
+        
+        created_date = getattr(dashboard, dashboard_fields.get('created_date', 'created_date'), None)
+        # If no creation date, use current timestamp as fallback
+        from datetime import datetime, timezone
+        if not created_date:
+            created_date = datetime.now(timezone.utc)
+            
+        recent_dashboards.append({
+            "titulo": getattr(dashboard, dashboard_fields['titulo']),
+            "categoria": category_name,
+            "created_date": created_date.isoformat() if created_date else None
+        })
+    
+    # Sort by creation date and return top 5
+    recent_dashboards.sort(key=lambda x: x['created_date'] or '', reverse=True)
+    return recent_dashboards[:5]
+
+@app.get("/api/system/featured-dashboards")
+def get_featured_dashboards(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get featured dashboards from different categories"""
+    dashboard_data = adapter.get_all_dashboards(db)
+    dashboard_fields = adapter.get_dashboard_field_mapping()
+    
+    # Group dashboards by category
+    by_category = {}
+    for item in dashboard_data:
+        dashboard = item['dashboard']
+        category_name = item.get('category_name', 'Unknown')
+        
+        if category_name not in by_category:
+            by_category[category_name] = []
+        
+        by_category[category_name].append({
+            "id": getattr(dashboard, dashboard_fields['id']),
+            "titulo": getattr(dashboard, dashboard_fields['titulo']),
+            "descripcion": getattr(dashboard, dashboard_fields.get('descripcion', 'descripcion'), '') or '',
+            "categoria": category_name
+        })
+    
+    # Get one featured dashboard from each major category
+    featured = []
+    priority_categories = ['Operations', 'Finance', 'Workshop', 'Human Resources', 'Accounting']
+    
+    for category in priority_categories:
+        if category in by_category and by_category[category]:
+            # Take the first dashboard from each category
+            dashboard = by_category[category][0]
+            featured.append(dashboard)
+            if len(featured) >= 3:  # Limit to 3 featured dashboards
+                break
+    
+    return featured
 
 # --- EMPLOYEE ENDPOINTS ---
 @app.get("/api/employees")
