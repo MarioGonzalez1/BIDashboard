@@ -1,0 +1,44 @@
+<div class="form-container">
+  <h3>{{ getFormTitle() }}</h3>
+  <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+    <div class="form-row">
+      <input type="text" placeholder="Nombre" formControlName="firstName">
+      <input type="text" placeholder="Apellido" formControlName="lastName">
+    </div>
+    <input type="email" placeholder="Email" formControlName="email">
+    <div class="form-row">
+      <select formControlName="position">
+        <option value="" disabled>Seleccionar Puesto</option>
+        @for (position of positions; track position) {
+          <option [value]="position">{{ position }}</option>
+        }
+      </select>
+      <select formControlName="department">
+        <option value="" disabled>Seleccionar Departamento</option>
+        @for (dept of departments; track dept) {
+          <option [value]="dept">{{ dept }}</option>
+        }
+      </select>
+    </div>
+    <div class="form-row">
+      <input type="date" placeholder="Fecha de Ingreso" formControlName="hireDate">
+      <input type="number" placeholder="Salario" formControlName="salary" min="0" step="0.01">
+    </div>
+    <select formControlName="status">
+      <option value="active">Activo</option>
+      <option value="inactive">Inactivo</option>
+    </select>
+    <input type="tel" placeholder="Teléfono (opcional)" formControlName="phone">
+    <textarea 
+      placeholder="Dirección (opcional)" 
+      formControlName="address"
+      rows="2">
+    </textarea>
+    <div class="form-buttons">
+      <button type="submit" [disabled]="!addForm.valid">
+        {{ getSubmitButtonText() }}
+      </button>
+      <button type="button" class="cancel-btn" (click)="onCancel()">Cancelar</button>
+    </div>
+  </form>
+</div>

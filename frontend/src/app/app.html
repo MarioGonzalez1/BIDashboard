@@ -1,0 +1,48 @@
+@if (!isAuthenticated) {
+  <app-login></app-login>
+} @else {
+  <div class="main-container">
+    <aside class="sidebar">
+      <div class="logo-container">
+        <img src="/forza-logo.png" alt="Forza Logo">
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li (click)="setFilter('all')" [class.active]="currentFilter === 'all'">All Dashboards</li>
+          <li (click)="setFilter('Operations')" [class.active]="currentFilter === 'Operations'">Operations</li>
+          <li (click)="setFilter('Finance')" [class.active]="currentFilter === 'Finance'">Finance</li>
+          <li (click)="setFilter('Accounting')" [class.active]="currentFilter === 'Accounting'">Accounting</li>
+          <li (click)="setFilter('Workshop')" [class.active]="currentFilter === 'Workshop'">Workshop</li>
+          <ul class="sub-menu" *ngIf="currentFilter === 'Workshop' || workshopExpanded">
+            <li (click)="setFilter('Forza Transportation')" [class.active]="currentFilter === 'Forza Transportation'">Forza Transportation</li>
+            <li (click)="setFilter('Force One Transport')" [class.active]="currentFilter === 'Force One Transport'">Force One Transport</li>
+          </ul>
+        </ul>
+      </nav>
+      <div class="add-button-container">
+        <button (click)="showAddForm = !showAddForm">+ Add Dashboard</button>
+        <button (click)="logout()" class="logout-btn">Logout</button>
+      </div>
+    </aside>
+    <main class="content">
+      <header class="content-header">
+        <h1>{{ currentFilter === 'all' ? 'All Dashboards' : currentFilter }}</h1>
+      </header>
+      <div class="gallery">
+        @for (board of filteredDashboards; track board.id) {
+          <app-dashboard-card 
+            [dashboard]="board"
+            (editDashboard)="onEditDashboard($event)"
+            (deleteDashboard)="onDeleteDashboard($event)">
+          </app-dashboard-card>
+        }
+      </div>
+      @if (showAddForm) {
+        <app-add-dashboard-form 
+          [dashboardToEdit]="dashboardToEdit"
+          (dashboardAdded)="onDashboardAdded()">
+        </app-add-dashboard-form>
+      }
+    </main>
+  </div>
+}

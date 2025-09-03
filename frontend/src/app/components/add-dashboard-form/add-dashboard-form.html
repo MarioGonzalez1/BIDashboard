@@ -1,0 +1,32 @@
+<div class="form-container">
+  <h3>{{ isEditMode ? 'Edit Dashboard' : 'Add New Dashboard' }}</h3>
+  <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+    <input type="text" placeholder="Dashboard Title" formControlName="titulo">
+    <input type="url" placeholder="Access URL" formControlName="url_acceso">
+    <select formControlName="categoria">
+      <option value="" disabled>Select a Category</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+    <select formControlName="subcategoria" *ngIf="subcategories[selectedCategory]">
+      <option value="">Select a Subcategory (optional)</option>
+      @for (subcat of subcategories[selectedCategory]; track subcat) {
+        <option [value]="subcat">{{ subcat }}</option>
+      }
+    </select>
+    <textarea 
+      placeholder="Dashboard Description (optional)" 
+      formControlName="descripcion"
+      rows="3">
+    </textarea>
+    <label for="screenshot">Screenshot Image{{ isEditMode ? ' (optional)' : '' }}:</label>
+    <input id="screenshot" type="file" (change)="onFileSelect($event)">
+    <div class="form-buttons">
+      <button type="submit" [disabled]="!addForm.valid || (!isEditMode && !selectedFile)">
+        {{ isEditMode ? 'Update Dashboard' : 'Add Dashboard' }}
+      </button>
+      <button type="button" class="cancel-btn" (click)="onCancel()">Cancel</button>
+    </div>
+  </form>
+</div>

@@ -1,0 +1,141 @@
+.employee-card {
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  position: relative;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.employee-info {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex: 1;
+}
+
+.employee-avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.employee-details {
+  h3 {
+    margin: 0 0 4px 0;
+    font-size: 18px;
+    color: #333;
+  }
+  
+  .position {
+    margin: 0 0 2px 0;
+    font-size: 14px;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .department {
+    margin: 0;
+    font-size: 13px;
+    color: #888;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.edit-btn, .delete-btn {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  
+  &:hover {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+}
+
+.delete-btn {
+  &:hover {
+    background: #ffebee;
+    border-color: #f44336;
+  }
+}
+
+.card-body {
+  padding: 16px;
+}
+
+.employee-meta {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  .label {
+    font-size: 13px;
+    color: #666;
+    font-weight: 500;
+  }
+  
+  .value {
+    font-size: 13px;
+    color: #333;
+    text-align: right;
+  }
+}
+
+.status-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  
+  &.status-active {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+  }
+  
+  &.status-inactive {
+    background-color: #ffebee;
+    color: #d32f2f;
+  }
+}

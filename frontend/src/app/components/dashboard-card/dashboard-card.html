@@ -1,0 +1,28 @@
+<div class="card">
+  <div class="card-header">
+    <div class="action-buttons">
+      <button class="edit-btn" (click)="onEdit()" title="Editar dashboard">
+        ✏️
+      </button>
+      <button 
+        *ngIf="authService.isAdmin()" 
+        class="delete-btn" 
+        (click)="onDelete()" 
+        title="Eliminar dashboard">
+        🗑️
+      </button>
+    </div>
+  </div>
+  <div class="card-main" 
+       (click)="openLink()" 
+       [appTooltip]="dashboard.titulo"
+       [tooltipDescription]="dashboard.descripcion || ''"
+       placement="top">
+    <img [src]="dashboard.url_imagen_preview" alt="Screenshot of {{ dashboard.titulo }}">
+    <div class="card-content">
+      <h3>{{ dashboard.titulo }}</h3>
+      <p class="description" *ngIf="dashboard.descripcion">{{ dashboard.descripcion }}</p>
+      <span class="category-tag">{{ dashboard.categoria }}</span>
+    </div>
+  </div>
+</div>
