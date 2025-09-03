@@ -14,10 +14,11 @@ export class AddDashboardFormComponent implements OnChanges {
   @Input() dashboardToEdit: IDashboard | null = null;
   addForm: FormGroup;
   selectedFile: File | null = null;
-  categories = ['Operations', 'Finance', 'Accounting', 'Workshop', 'Human Resources'];
+  categories = ['Operations', 'Finance', 'Accounting', 'Workshop', 'Human Resources', 'Executive & Management'];
   subcategories: { [key: string]: string[] } = {
     'Workshop': ['Forza Transportation', 'Force One Transport'],
-    'Human Resources': ['Employee Management', 'Payroll', 'Performance Reviews', 'Recruiting', 'Training']
+    'Human Resources': ['Employee Management', 'Payroll', 'Performance Reviews', 'Recruiting', 'Training'],
+    'Executive & Management': ['Executive Dashboard', 'Performance Metrics', 'Strategic Planning', 'Business Intelligence']
   };
   selectedCategory = '';
   isEditMode = false;

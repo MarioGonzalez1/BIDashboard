@@ -15,11 +15,16 @@ import { CommonModule } from '@angular/common';
 export class App implements OnInit {
   allDashboards: IDashboard[] = [];
   filteredDashboards: IDashboard[] = [];
-  currentFilter: string = 'all';
+  currentFilter: string = 'getting-started';
   showAddForm: boolean = false;
   isAuthenticated: boolean = false;
   dashboardToEdit: IDashboard | null = null;
   workshopExpanded: boolean = false;
+  hrExpanded: boolean = false;
+  totalDashboards: number = 0;
+  activeUsers: number = 127;
+  recentUpdates: number = 8;
+  showRequestModal: boolean = false;
 
   constructor(
     private dashboardService: DashboardService,
@@ -39,6 +44,7 @@ export class App implements OnInit {
     this.dashboardService.getDashboards().subscribe({
       next: data => {
         this.allDashboards = data;
+        this.totalDashboards = data.length;
         this.setFilter(this.currentFilter);
       },
       error: error => {
@@ -53,21 +59,33 @@ export class App implements OnInit {
   setFilter(filter: string) {
     this.currentFilter = filter;
     
-    if (filter === 'all') {
+    if (filter === 'getting-started') {
       this.filteredDashboards = this.allDashboards;
     } else if (filter === 'Workshop') {
       // Show all workshop items (category = Workshop)
       this.filteredDashboards = this.allDashboards.filter(d => d.categoria === 'Workshop');
       this.workshopExpanded = true;
+      this.hrExpanded = false;
+    } else if (filter === 'Human Resources') {
+      // Show all HR items (category = Human Resources)
+      this.filteredDashboards = this.allDashboards.filter(d => d.categoria === 'Human Resources');
+      this.hrExpanded = true;
+      this.workshopExpanded = false;
     } else if (filter === 'Forza Transportation' || filter === 'Force One Transport') {
-      // Filter by subcategory
+      // Filter by workshop subcategory
       this.filteredDashboards = this.allDashboards.filter(d => 
         d.categoria === 'Workshop' && d.subcategoria === filter
+      );
+    } else if (filter === 'Employee Management' || filter === 'Payroll' || filter === 'Performance Reviews' || filter === 'Recruiting' || filter === 'Training') {
+      // Filter by HR subcategory
+      this.filteredDashboards = this.allDashboards.filter(d => 
+        d.categoria === 'Human Resources' && d.subcategoria === filter
       );
     } else {
       // Regular category filtering
       this.filteredDashboards = this.allDashboards.filter(d => d.categoria === filter);
       this.workshopExpanded = false;
+      this.hrExpanded = false;
     }
   }
   

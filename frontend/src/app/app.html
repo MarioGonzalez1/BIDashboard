@@ -8,14 +8,23 @@
       </div>
       <nav class="main-nav">
         <ul>
-          <li (click)="setFilter('all')" [class.active]="currentFilter === 'all'">All Dashboards</li>
+          <li (click)="setFilter('getting-started')" [class.active]="currentFilter === 'getting-started'">Getting Started</li>
           <li (click)="setFilter('Operations')" [class.active]="currentFilter === 'Operations'">Operations</li>
           <li (click)="setFilter('Finance')" [class.active]="currentFilter === 'Finance'">Finance</li>
           <li (click)="setFilter('Accounting')" [class.active]="currentFilter === 'Accounting'">Accounting</li>
           <li (click)="setFilter('Workshop')" [class.active]="currentFilter === 'Workshop'">Workshop</li>
+          <li (click)="setFilter('Human Resources')" [class.active]="currentFilter === 'Human Resources'">Human Resources</li>
+          <li (click)="setFilter('Executive & Management')" [class.active]="currentFilter === 'Executive & Management'">Executive & Management</li>
           <ul class="sub-menu" *ngIf="currentFilter === 'Workshop' || workshopExpanded">
             <li (click)="setFilter('Forza Transportation')" [class.active]="currentFilter === 'Forza Transportation'">Forza Transportation</li>
             <li (click)="setFilter('Force One Transport')" [class.active]="currentFilter === 'Force One Transport'">Force One Transport</li>
+          </ul>
+          <ul class="sub-menu" *ngIf="currentFilter === 'Human Resources' || hrExpanded">
+            <li (click)="setFilter('Employee Management')" [class.active]="currentFilter === 'Employee Management'">Employee Management</li>
+            <li (click)="setFilter('Payroll')" [class.active]="currentFilter === 'Payroll'">Payroll</li>
+            <li (click)="setFilter('Performance Reviews')" [class.active]="currentFilter === 'Performance Reviews'">Performance Reviews</li>
+            <li (click)="setFilter('Recruiting')" [class.active]="currentFilter === 'Recruiting'">Recruiting</li>
+            <li (click)="setFilter('Training')" [class.active]="currentFilter === 'Training'">Training</li>
           </ul>
         </ul>
       </nav>
@@ -26,17 +35,203 @@
     </aside>
     <main class="content">
       <header class="content-header">
-        <h1>{{ currentFilter === 'all' ? 'All Dashboards' : currentFilter }}</h1>
+        <h1>{{ currentFilter === 'getting-started' ? 'Getting Started' : currentFilter }}</h1>
+        <button class="request-dashboard-btn" (click)="showRequestModal = true">
+          📊 Request New Dashboard
+        </button>
       </header>
-      <div class="gallery">
-        @for (board of filteredDashboards; track board.id) {
-          <app-dashboard-card 
-            [dashboard]="board"
-            (editDashboard)="onEditDashboard($event)"
-            (deleteDashboard)="onDeleteDashboard($event)">
-          </app-dashboard-card>
-        }
-      </div>
+      @if (currentFilter === 'getting-started') {
+        <div class="getting-started-content">
+          <div class="welcome-section">
+            <h2>Welcome to the Business Intelligence Dashboard Portal</h2>
+            <p>Your central hub for all business intelligence and analytics across Forza Transportation Services.</p>
+          </div>
+          
+          <div class="bi-team-section">
+            <h2>Meet Your BI Team</h2>
+            <p>Our dedicated Business Intelligence team is here to help you make data-driven decisions. Contact us for dashboard requests, training, or analytics support.</p>
+            
+            <div class="team-cards">
+              <div class="team-card">
+                <div class="team-photo">
+                  <img src="/Martin.jpg" alt="Martin Alejandro Martinez Rodea" />
+                </div>
+                <h3>Martin Alejandro Martinez Rodea</h3>
+                <p class="role">BI Team Lead - Mexico</p>
+                <p class="email">marmartinez&#64;forzatrans.com</p>
+                <p class="description">Leading business intelligence initiatives and dashboard strategy</p>
+              </div>
+              
+              <div class="team-card">
+                <div class="team-photo">
+                  <img src="/Alan.jpg" alt="Alan Saucedo Rodriguez" />
+                </div>
+                <h3>Alan Saucedo Rodriguez</h3>
+                <p class="role">BI Senior Analyst - Mexico</p>
+                <p class="email">alan.saucedo&#64;forzatrans.com</p>
+                <p class="description">Equipment control dashboards and yard operations analytics specialist</p>
+              </div>
+              
+              <div class="team-card">
+                <div class="team-photo">
+                  <img src="/Andrea.png" alt="Andrea Sofia Lopez" />
+                </div>
+                <h3>Andrea Sofia Lopez</h3>
+                <p class="role">BI Senior Analyst - Mexico</p>
+                <p class="email">andrea.lopez&#64;forzatrans.com</p>
+                <p class="description">Human Resources analytics and HR dashboard development specialist</p>
+              </div>
+              
+              <div class="team-card">
+                <div class="team-photo">
+                  <img src="/Andres.jpg" alt="Andres Huguet Mack" />
+                </div>
+                <h3>Andres Huguet Mack</h3>
+                <p class="role">BI Senior Analyst - Mexico</p>
+                <p class="email">andres.huguet&#64;forzatrans.com</p>
+                <p class="description">Operations analytics and transportation performance dashboard specialist</p>
+              </div>
+              
+              <div class="team-card">
+                <div class="team-photo">
+                  <img src="/Miguel-Angel.jpg" alt="Miguel Angel Loera Guerrero" />
+                </div>
+                <h3>Miguel Angel Loera Guerrero</h3>
+                <p class="role">BI Senior Analyst - Mexico</p>
+                <p class="email">miguel.loera&#64;forzatrans.com</p>
+                <p class="description">Workshop analytics and maintenance dashboard development specialist</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="stats-section">
+            <h2>System Overview</h2>
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-number">{{ totalDashboards }}</div>
+                <div class="stat-label">Total Dashboards</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">6</div>
+                <div class="stat-label">Departments</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ activeUsers }}</div>
+                <div class="stat-label">Active Users</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number">{{ recentUpdates }}</div>
+                <div class="stat-label">Recent Updates</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="recent-updates-section">
+            <h2>Recent Updates</h2>
+            <div class="updates-list">
+              <div class="update-item">
+                <div class="update-date">Dec 15, 2024</div>
+                <div class="update-content">New Operations Performance dashboard added to Operations department</div>
+              </div>
+              <div class="update-item">
+                <div class="update-date">Dec 10, 2024</div>
+                <div class="update-content">HR Analytics dashboard updated with new metrics</div>
+              </div>
+              <div class="update-item">
+                <div class="update-date">Dec 5, 2024</div>
+                <div class="update-content">Workshop Maintenance dashboard enhanced with real-time data</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="featured-dashboards-section">
+            <h2>Featured Dashboards</h2>
+            <div class="featured-grid">
+              <div class="featured-item">
+                <div class="featured-category">Operations</div>
+                <div class="featured-title">Fleet Performance Overview</div>
+                <div class="featured-description">Real-time vehicle tracking and performance metrics</div>
+              </div>
+              <div class="featured-item">
+                <div class="featured-category">Finance</div>
+                <div class="featured-title">Revenue Analytics</div>
+                <div class="featured-description">Comprehensive revenue analysis and forecasting</div>
+              </div>
+              <div class="featured-item">
+                <div class="featured-category">Workshop</div>
+                <div class="featured-title">Maintenance Schedule</div>
+                <div class="featured-description">Vehicle maintenance tracking and scheduling</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="training-resources-section">
+            <h2>Training Resources</h2>
+            <div class="resources-grid">
+              <div class="resource-item">
+                <div class="resource-icon">📊</div>
+                <div class="resource-content">
+                  <h3>Power BI Basics</h3>
+                  <p>Learn the fundamentals of Power BI dashboard navigation</p>
+                  <a href="#" class="resource-link">View Tutorial</a>
+                </div>
+              </div>
+              <div class="resource-item">
+                <div class="resource-icon">📈</div>
+                <div class="resource-content">
+                  <h3>Data Analysis Guide</h3>
+                  <p>Understanding charts, filters, and data interpretation</p>
+                  <a href="#" class="resource-link">Download Guide</a>
+                </div>
+              </div>
+              <div class="resource-item">
+                <div class="resource-icon">🎥</div>
+                <div class="resource-content">
+                  <h3>Video Tutorials</h3>
+                  <p>Step-by-step video guides for common dashboard tasks</p>
+                  <a href="#" class="resource-link">Watch Videos</a>
+                </div>
+              </div>
+              <div class="resource-item">
+                <div class="resource-icon">📋</div>
+                <div class="resource-content">
+                  <h3>Best Practices</h3>
+                  <p>Tips for effective dashboard usage and data insights</p>
+                  <a href="#" class="resource-link">Read More</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="quick-start-section">
+            <h2>Quick Start Guide</h2>
+            <div class="guide-steps">
+              <div class="step">
+                <h3>1. Navigate Departments</h3>
+                <p>Use the sidebar to browse dashboards by department (Operations, Finance, Workshop, etc.)</p>
+              </div>
+              <div class="step">
+                <h3>2. View Dashboards</h3>
+                <p>Click on any dashboard card to open it in a new tab</p>
+              </div>
+              <div class="step">
+                <h3>3. Request New Dashboards</h3>
+                <p>Use the request form above to submit custom dashboard requirements</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="gallery">
+          @for (board of filteredDashboards; track board.id) {
+            <app-dashboard-card 
+              [dashboard]="board"
+              (editDashboard)="onEditDashboard($event)"
+              (deleteDashboard)="onDeleteDashboard($event)">
+            </app-dashboard-card>
+          }
+        </div>
+      }
       @if (showAddForm) {
         <app-add-dashboard-form 
           [dashboardToEdit]="dashboardToEdit"
@@ -45,4 +240,71 @@
       }
     </main>
   </div>
+  
+  <!-- Request Dashboard Modal -->
+  @if (showRequestModal) {
+    <div class="modal-overlay" (click)="showRequestModal = false">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>📊 Request New Dashboard</h2>
+          <button class="close-btn" (click)="showRequestModal = false">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <p class="modal-subtitle">Fill out the details below and we'll get back to you within 24 hours</p>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="dashboard-name">Dashboard Name</label>
+              <input type="text" id="dashboard-name" placeholder="Enter dashboard name" class="form-input">
+            </div>
+            <div class="form-group">
+              <label for="department">Department</label>
+              <select id="department" class="form-input">
+                <option value="">Select Department</option>
+                <option value="Operations">Operations</option>
+                <option value="Finance">Finance</option>
+                <option value="Accounting">Accounting</option>
+                <option value="Workshop">Workshop</option>
+                <option value="Human Resources">Human Resources</option>
+                <option value="Executive & Management">Executive & Management</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group form-full-width">
+            <label for="requirements">Requirements & Description</label>
+            <textarea id="requirements" placeholder="Describe your dashboard requirements, key metrics, data sources, and any specific features needed..." class="form-textarea"></textarea>
+          </div>
+          
+          <div class="priority-section">
+            <label>Priority Level</label>
+            <div class="priority-options">
+              <div class="priority-option">
+                <input type="radio" id="priority-low" name="priority" value="low">
+                <label for="priority-low" class="priority-label low">Low Priority</label>
+              </div>
+              <div class="priority-option">
+                <input type="radio" id="priority-medium" name="priority" value="medium" checked>
+                <label for="priority-medium" class="priority-label medium">Medium Priority</label>
+              </div>
+              <div class="priority-option">
+                <input type="radio" id="priority-high" name="priority" value="high">
+                <label for="priority-high" class="priority-label high">High Priority</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="showRequestModal = false">Cancel</button>
+          <button class="submit-btn">Submit Request</button>
+          <p class="help-text">
+            <span class="help-icon">💡</span>
+            Our team will review your request and contact you for any clarifications needed
+          </p>
+        </div>
+      </div>
+    </div>
+  }
 }
