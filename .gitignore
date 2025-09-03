@@ -1,0 +1,53 @@
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Python Backend
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+env/
+
+# Base de datos y archivos subidos
+backend/db.json
+backend/static/images/*
+!backend/static/images/.gitkeep
+
+# Configuración sensible
+.env
+.env.local
+.env.production
+config.local.json
+
+# Angular Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Claude Code
+.claude/settings.local.json
