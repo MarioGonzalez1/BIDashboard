@@ -1,0 +1,46 @@
+# BIDashboard Database Requirements
+# SQL Server connection and ORM dependencies
+
+# Core FastAPI requirements (existing)
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+pydantic==2.5.0
+
+# Database connectivity
+pyodbc==5.0.0
+sqlalchemy==2.0.23
+sqlalchemy-utils==0.41.1
+
+# Database migration and management
+alembic==1.12.1
+python-dotenv==1.0.0
+
+# Connection pooling and async support
+databases==0.8.0
+asyncpg==0.29.0
+aioodbc==0.5.0
+
+# Data serialization
+orjson==3.9.10
+python-dateutil==2.8.2
+
+# Monitoring and logging
+prometheus-client==0.19.0
+python-json-logger==2.0.7
+
+# Testing database operations
+pytest==7.4.3
+pytest-asyncio==0.21.1
+factory-boy==3.3.0
+faker==20.1.0
+
+# Optional: Azure SQL Database support
+azure-identity==1.15.0
+azure-keyvault-secrets==4.7.0
+
+# Optional: Database schema visualization
+eralchemy2==1.3.8
+graphviz==0.20.1

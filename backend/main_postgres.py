@@ -10,8 +10,7 @@ from passlib.context import CryptContext
 from jose import JWTError, jwt
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from database_config import get_db, DATABASE_INFO
-from database_adapter import adapter
+from database_postgres import get_db, User, Dashboard, Employee
 
 # --- CONFIGURACIÓN ---
 STATIC_DIR = "static"
@@ -40,10 +39,7 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-app = FastAPI(
-    title=f"BI Dashboard Portal API - {DATABASE_INFO['database_type'].upper()} Edition",
-    description=f"Connected to {DATABASE_INFO['database_type'].upper()} database"
-)
+app = FastAPI(title="BI Dashboard Portal API - PostgreSQL Edition")
 
 # --- MIDDLEWARE (CORS) ---
 app.add_middleware(
@@ -79,14 +75,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_user_from_db(username: str, db: Session):
-    return adapter.get_user_by_username(db, username)
+def get_user_from_db(username: str, db: Session) -> Optional[User]:
+    return db.query(User).filter(User.username == username).first()
 
-def authenticate_user(username: str, password: str, db: Session):
+def authenticate_user(username: str, password: str, db: Session) -> Optional[User]:
     user = get_user_from_db(username, db)
     if not user:
         return None
-    if not adapter.verify_user_password(user, password, pwd_context):
+    if not verify_password(password, user.hashed_password):
         return None
     return user
 
@@ -109,7 +105,7 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)) 
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-def get_current_user(username: str = Depends(verify_token), db: Session = Depends(get_db)):
+def get_current_user(username: str = Depends(verify_token), db: Session = Depends(get_db)) -> User:
     user = get_user_from_db(username, db)
     if user is None:
         raise HTTPException(
@@ -118,10 +114,8 @@ def get_current_user(username: str = Depends(verify_token), db: Session = Depend
         )
     return user
 
-def get_current_admin_user(current_user = Depends(get_current_user)):
-    fields = adapter.get_user_field_mapping()
-    is_admin_attr = fields['is_admin']
-    if not getattr(current_user, is_admin_attr):
+def get_current_admin_user(current_user: User = Depends(get_current_user)) -> User:
+    if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required"
@@ -129,15 +123,6 @@ def get_current_admin_user(current_user = Depends(get_current_user)):
     return current_user
 
 # --- ENDPOINTS DE LA API ---
-
-@app.get("/api/database/info")
-async def get_database_info():
-    """Get current database configuration information"""
-    return {
-        "database_type": DATABASE_INFO['database_type'],
-        "connected": DATABASE_INFO['connected'],
-        "message": f"Connected to {DATABASE_INFO['database_type'].upper()} database"
-    }
 
 @app.post("/api/login", response_model=Token)
 async def login(user_login: UserLogin, db: Session = Depends(get_db)):
@@ -163,29 +148,31 @@ async def register(user_login: UserLogin, db: Session = Depends(get_db)):
         )
     
     hashed_password = hash_password(user_login.password)
-    is_admin = (user_login.username == "admin" or user_login.username == "mario_gonzalez")
-    new_user = adapter.create_user(db, user_login.username, hashed_password, is_admin)
+    new_user = User(
+        username=user_login.username,
+        hashed_password=hashed_password,
+        is_admin=(user_login.username == "admin")  # First user named 'admin' gets admin rights
+    )
+    
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
     
     return {"message": "User registered successfully"}
 
 @app.get("/api/tableros", response_model=List[Dict[str, Any]])
-def get_all_tableros(current_user = Depends(get_current_user), db: Session = Depends(get_db)):
-    dashboard_data = adapter.get_all_dashboards(db)
+def get_all_tableros(current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    dashboards = db.query(Dashboard).all()
     tableros = []
-    dashboard_fields = adapter.get_dashboard_field_mapping()
-    
-    for item in dashboard_data:
-        dashboard = item['dashboard']
-        category_name = item.get('category_name', 'Unknown')
-        
+    for dashboard in dashboards:
         tablero = {
-            "id": getattr(dashboard, dashboard_fields['id']),
-            "titulo": getattr(dashboard, dashboard_fields['titulo']),
-            "url_acceso": getattr(dashboard, dashboard_fields['url_acceso']),
-            "categoria": category_name,
-            "subcategoria": getattr(dashboard, dashboard_fields.get('subcategoria', 'subcategoria'), "") or "",
-            "descripcion": getattr(dashboard, dashboard_fields.get('descripcion', 'descripcion'), "") or "",
-            "url_imagen_preview": f"http://127.0.0.1:8000{getattr(dashboard, dashboard_fields['url_imagen_preview'])}" if getattr(dashboard, dashboard_fields['url_imagen_preview']) else ""
+            "id": dashboard.id,
+            "titulo": dashboard.titulo,
+            "url_acceso": dashboard.url_acceso,
+            "categoria": dashboard.categoria,
+            "subcategoria": dashboard.subcategoria or "",
+            "descripcion": dashboard.descripcion or "",
+            "url_imagen_preview": f"http://127.0.0.1:8000{dashboard.url_imagen_preview}" if dashboard.url_imagen_preview else ""
         }
         tableros.append(tablero)
     return tableros
