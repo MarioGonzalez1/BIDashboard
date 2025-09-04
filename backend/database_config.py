@@ -10,7 +10,7 @@ from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 
 # Database type selection
-DATABASE_TYPE = os.getenv("DATABASE_TYPE", "postgresql").lower()  # postgresql or mssql
+DATABASE_TYPE = os.getenv("DATABASE_TYPE", "sqlite").lower()  # sqlite, postgresql or mssql
 
 class DatabaseConfig:
     def __init__(self):
@@ -25,6 +25,8 @@ class DatabaseConfig:
         try:
             if self.database_type == "mssql":
                 self._setup_mssql()
+            elif self.database_type == "sqlite":
+                self._setup_sqlite()
             else:
                 self._setup_postgresql()
                 
@@ -35,6 +37,33 @@ class DatabaseConfig:
                 print("🔄 Falling back to PostgreSQL...")
                 self.database_type = "postgresql"
                 self._setup_postgresql()
+            elif self.database_type == "postgresql":
+                print("🔄 Falling back to SQLite...")
+                self.database_type = "sqlite"
+                self._setup_sqlite()
+    
+    def _setup_sqlite(self):
+        """Setup SQLite connection and models"""
+        try:
+            from database_sqlite import engine, SessionLocal
+            from database_sqlite import User, Dashboard, Employee
+            
+            self.engine = engine
+            self.SessionLocal = SessionLocal
+            self.models = {
+                'User': User,
+                'Dashboard': Dashboard, 
+                'Employee': Employee
+            }
+            
+            # Initialize database with tables and default users
+            from database_sqlite import init_database
+            init_database()
+                
+        except ImportError as e:
+            raise Exception(f"SQLite modules not found: {e}")
+        except Exception as e:
+            raise Exception(f"SQLite setup failed: {e}")
     
     def _setup_postgresql(self):
         """Setup PostgreSQL connection and models"""

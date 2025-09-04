@@ -166,6 +166,8 @@ async def get_current_user_info(current_user = Depends(get_current_user)):
         "email": getattr(current_user, fields['email'], None),
         "first_name": getattr(current_user, fields['first_name'], None),
         "last_name": getattr(current_user, fields['last_name'], None),
+        "position": getattr(current_user, fields['position'], None),
+        "department": getattr(current_user, fields['department'], None),
         "is_admin": getattr(current_user, fields['is_admin'], False),
         "is_active": getattr(current_user, fields['is_active'], True),
     }

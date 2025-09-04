@@ -21,19 +21,23 @@ class DatabaseAdapter:
                 'email': 'EmailAddress',
                 'first_name': 'FirstName',
                 'last_name': 'LastName',
+                'position': 'Position',
+                'department': 'Department',
                 'hashed_password': 'PasswordHash',
                 'is_admin': 'IsAdmin',
                 'is_active': 'IsActive',
                 'created_date': 'CreatedDate',
                 'last_login_date': 'LastLoginDate'
             }
-        else:  # postgresql
+        else:  # postgresql and sqlite
             return {
                 'id': 'id',
                 'username': 'username',
                 'email': 'email',
                 'first_name': 'first_name',
                 'last_name': 'last_name',
+                'position': 'position',
+                'department': 'department',
                 'hashed_password': 'hashed_password',
                 'is_admin': 'is_admin',
                 'is_active': 'is_active',
