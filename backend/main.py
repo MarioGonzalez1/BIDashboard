@@ -223,7 +223,7 @@ async def create_tablero(
     subcategoria: str = Form(""),
     descripcion: str = Form(""),
     screenshot: UploadFile = File(...),
-    current_user: User = Depends(get_current_user),
+    current_admin: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
@@ -241,7 +241,7 @@ async def create_tablero(
         subcategoria=subcategoria,
         descripcion=descripcion,
         url_imagen_preview=f"/{STATIC_DIR}/images/{image_filename}",
-        created_by=current_user.id
+        created_by=current_admin.id
     )
     
     db.add(new_dashboard)
@@ -267,7 +267,7 @@ async def update_tablero(
     subcategoria: str = Form(""),
     descripcion: str = Form(""),
     screenshot: UploadFile = File(None),
-    current_user: User = Depends(get_current_user),
+    current_admin: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     dashboard = db.query(adapter.Dashboard).filter(adapter.Dashboard.id == tablero_id).first()
@@ -458,7 +458,7 @@ def get_employees(current_user: User = Depends(get_current_user), db: Session = 
 @app.post("/api/employees")
 def create_employee(
     employee_data: dict,
-    current_user: User = Depends(get_current_user),
+    current_admin: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
     new_employee = Employee(
@@ -471,7 +471,7 @@ def create_employee(
         salary=employee_data["salary"],
         hire_date=datetime.fromisoformat(employee_data["hireDate"].replace("Z", "+00:00")),
         status=employee_data.get("status", "active"),
-        created_by=current_user.id
+        created_by=current_admin.id
     )
     
     db.add(new_employee)

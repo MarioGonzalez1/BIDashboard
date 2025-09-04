@@ -540,4 +540,28 @@
       </div>
     </div>
   }
+  
+  <!-- Confirm Delete Modal -->
+  @if (showConfirmModal) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="modal-content confirm-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ confirmModalData.title }}</h2>
+          <button class="close-btn" (click)="cancelDelete()">×</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="confirm-content">
+            <p class="confirm-message">{{ confirmModalData.message }}</p>
+            <p class="confirm-warning">Esta acción no se puede deshacer.</p>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button class="cancel-btn" (click)="cancelDelete()">Cancelar</button>
+          <button class="delete-btn confirm-delete-btn" (click)="confirmDelete()">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  }
 }

@@ -1,10 +1,15 @@
 <div class="login-container">
-  <div class="login-card">
-    <div class="logo-container">
-      <img src="/forza-logo-nuevo.png" alt="Forza Logo" class="login-logo">
-    </div>
-    <h2>Business Intelligence Dashboard</h2>
-    <p class="login-subtitle">Sign in to access your dashboards</p>
+  <div class="image-section">
+    <div class="truck-image"></div>
+  </div>
+  
+  <div class="form-section">
+    <div class="login-card">
+      <div class="logo-container">
+        <img src="/forza-logo-nuevo.png" alt="Forza Logo" class="login-logo">
+      </div>
+      <h2>Business Intelligence Portal</h2>
+      <p class="login-subtitle">Sign in to access your dashboards</p>
     
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="form-group">
@@ -47,10 +52,11 @@
       </button>
     </form>
 
-    <div class="help-section">
-      <p class="help-text">
-        Need access? Contact your system administrator.
-      </p>
+      <div class="help-section">
+        <p class="help-text">
+          Need access? Contact your system administrator.
+        </p>
+      </div>
     </div>
   </div>
 </div>

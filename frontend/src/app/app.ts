@@ -40,6 +40,8 @@ export class App implements OnInit {
   quickStartGuideExpanded: boolean = true;
   showProfileDropdown: boolean = false;
   currentUser: any = null;
+  showConfirmModal: boolean = false;
+  confirmModalData: { title: string; message: string; dashboardId?: number } = { title: '', message: '' };
 
   // Force Angular recompilation - Updated with Font Awesome
   constructor(
@@ -175,18 +177,52 @@ export class App implements OnInit {
   }
 
   onDeleteDashboard(dashboardId: number) {
-    this.dashboardService.deleteDashboard(dashboardId).subscribe({
-      next: () => {
+    console.log('Delete dashboard called with ID:', dashboardId);
+    
+    if (!this.isAdmin) {
+      alert('Solo los administradores pueden eliminar dashboards');
+      return;
+    }
+    
+    // Find the dashboard to get its title
+    const dashboard = this.allDashboards.find(d => d.id === dashboardId);
+    const dashboardTitle = dashboard?.titulo || 'este dashboard';
+    
+    // Show confirmation modal
+    this.confirmModalData = {
+      title: 'Confirmar Eliminación',
+      message: `¿Estás seguro de que quieres eliminar el dashboard "${dashboardTitle}"?`,
+      dashboardId: dashboardId
+    };
+    this.showConfirmModal = true;
+  }
+
+  confirmDelete() {
+    if (!this.confirmModalData.dashboardId) return;
+    
+    this.dashboardService.deleteDashboard(this.confirmModalData.dashboardId).subscribe({
+      next: (response) => {
+        console.log('Dashboard deleted successfully:', response);
+        this.showConfirmModal = false;
         this.loadDashboards();
       },
       error: (error) => {
+        console.error('Error deleting dashboard:', error);
+        this.showConfirmModal = false;
         if (error.status === 403) {
           alert('Solo los administradores pueden eliminar dashboards');
+        } else if (error.status === 404) {
+          alert('Dashboard no encontrado');
         } else {
-          alert('Error al eliminar el dashboard');
+          alert('Error al eliminar el dashboard: ' + (error.error?.detail || error.message));
         }
       }
     });
+  }
+
+  cancelDelete() {
+    this.showConfirmModal = false;
+    this.confirmModalData = { title: '', message: '' };
   }
 
   logout() {

@@ -4,14 +4,14 @@
       <button 
         *ngIf="authService.isAdmin()" 
         class="edit-btn" 
-        (click)="onEdit()" 
+        (click)="onEdit($event)" 
         title="Editar dashboard">
         ✏️
       </button>
       <button 
         *ngIf="authService.isAdmin()" 
         class="delete-btn" 
-        (click)="onDelete()" 
+        (click)="onDelete($event)" 
         title="Eliminar dashboard">
         🗑️
       </button>

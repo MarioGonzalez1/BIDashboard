@@ -21,13 +21,28 @@ export class DashboardCardComponent {
     window.open(this.dashboard.url_acceso, '_blank');
   }
   
-  onEdit() {
+  onEdit(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!this.authService.isAdmin()) {
+      alert('Solo los administradores pueden editar dashboards');
+      return;
+    }
+    
     this.editDashboard.emit(this.dashboard);
   }
   
-  onDelete() {
-    if (confirm(`¿Estás seguro de que quieres eliminar el dashboard "${this.dashboard.titulo}"?`)) {
-      this.deleteDashboard.emit(this.dashboard.id);
+  onDelete(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (!this.authService.isAdmin()) {
+      alert('Solo los administradores pueden eliminar dashboards');
+      return;
     }
+    
+    console.log('Attempting to delete dashboard with ID:', this.dashboard.id);
+    this.deleteDashboard.emit(this.dashboard.id);
   }
 }
