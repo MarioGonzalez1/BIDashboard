@@ -20,6 +20,8 @@ export interface UserInfo {
   email?: string;
   first_name?: string;
   last_name?: string;
+  position?: string;
+  department?: string;
   is_admin: boolean;
   is_active: boolean;
 }

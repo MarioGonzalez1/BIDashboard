@@ -11,13 +11,15 @@ import { CommonModule } from '@angular/common';
 })
 export class AddDashboardFormComponent implements OnChanges {
   @Output() dashboardAdded = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
   @Input() dashboardToEdit: IDashboard | null = null;
   addForm: FormGroup;
   selectedFile: File | null = null;
-  categories = ['Operations', 'Finance', 'Accounting', 'Workshop', 'Human Resources', 'Executive & Management'];
+  categories = ['Operations', 'Finance', 'Accounting', 'Workshop', 'Human Resources', 'Tires', 'Executive & Management'];
   subcategories: { [key: string]: string[] } = {
     'Workshop': ['Forza Transportation', 'Force One Transport'],
     'Human Resources': ['Employee Management', 'Payroll', 'Performance Reviews', 'Recruiting', 'Training'],
+    'Tires': ['Alignments'],
     'Executive & Management': ['Executive Dashboard', 'Performance Metrics', 'Strategic Planning', 'Business Intelligence']
   };
   selectedCategory = '';
@@ -31,6 +33,7 @@ export class AddDashboardFormComponent implements OnChanges {
       subcategoria: [''],
       descripcion: ['']
     });
+    
     
     // Watch for category changes to reset subcategory
     this.addForm.get('categoria')?.valueChanges.subscribe(categoria => {
@@ -66,10 +69,14 @@ export class AddDashboardFormComponent implements OnChanges {
   }
 
   onSubmit() {
-    if (!this.addForm.valid) return;
+    if (!this.addForm.valid) {
+      return;
+    }
     
     // For edit mode, image is optional. For add mode, image is required
-    if (!this.isEditMode && !this.selectedFile) return;
+    if (!this.isEditMode && !this.selectedFile) {
+      return;
+    }
     
     const formData = new FormData();
     Object.keys(this.addForm.value).forEach(key => 
@@ -80,14 +87,24 @@ export class AddDashboardFormComponent implements OnChanges {
     }
     
     if (this.isEditMode && this.dashboardToEdit) {
-      this.dashboardService.updateDashboard(this.dashboardToEdit.id, formData).subscribe(() => {
-        this.dashboardAdded.emit();
-        this.resetForm();
+      this.dashboardService.updateDashboard(this.dashboardToEdit.id, formData).subscribe({
+        next: () => {
+          this.dashboardAdded.emit();
+          this.resetForm();
+        },
+        error: (error) => {
+          console.error('Error updating dashboard:', error);
+        }
       });
     } else {
-      this.dashboardService.addDashboard(formData).subscribe(() => {
-        this.dashboardAdded.emit();
-        this.resetForm();
+      this.dashboardService.addDashboard(formData).subscribe({
+        next: () => {
+          this.dashboardAdded.emit();
+          this.resetForm();
+        },
+        error: (error) => {
+          console.error('Error adding dashboard:', error);
+        }
       });
     }
   }
@@ -100,6 +117,6 @@ export class AddDashboardFormComponent implements OnChanges {
   
   onCancel() {
     this.resetForm();
-    this.dashboardAdded.emit(); // Emit to close the form
+    this.cancelled.emit();
   }
 }

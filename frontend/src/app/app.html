@@ -1,46 +1,184 @@
 @if (!isAuthenticated) {
   <app-login></app-login>
 } @else {
-  <div class="main-container">
-    <aside class="sidebar">
-      <div class="logo-container">
-        <img src="/forza-logo.png" alt="Forza Logo">
+  <div class="main-container" (click)="closeProfileDropdown()">
+    <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
+      <!-- Sidebar Toggle Button -->
+      <button class="sidebar-toggle" (click)="toggleSidebar()">
+        <i class="fas" [ngClass]="sidebarCollapsed ? 'fa-chevron-right' : 'fa-chevron-left'"></i>
+      </button>
+      
+      <div class="logo-container" [class.collapsed]="sidebarCollapsed">
+        <img src="/forza-logo.png" alt="Forza Logo" class="logo-full" *ngIf="!sidebarCollapsed">
+        <img src="/forza-logo.png" alt="Forza Logo" class="logo-compact" *ngIf="sidebarCollapsed">
       </div>
+      
       <nav class="main-nav">
         <ul>
-          <li (click)="setFilter('getting-started')" [class.active]="currentFilter === 'getting-started'">Getting Started</li>
-          <li (click)="setFilter('Operations')" [class.active]="currentFilter === 'Operations'">Operations</li>
-          <li (click)="setFilter('Finance')" [class.active]="currentFilter === 'Finance'">Finance</li>
-          <li (click)="setFilter('Accounting')" [class.active]="currentFilter === 'Accounting'">Accounting</li>
-          <li (click)="setFilter('Workshop')" [class.active]="currentFilter === 'Workshop'">Workshop</li>
-          <li (click)="setFilter('Human Resources')" [class.active]="currentFilter === 'Human Resources'">Human Resources</li>
-          <li (click)="setFilter('Executive & Management')" [class.active]="currentFilter === 'Executive & Management'">Executive & Management</li>
-          <ul class="sub-menu" *ngIf="currentFilter === 'Workshop' || workshopExpanded">
-            <li (click)="setFilter('Forza Transportation')" [class.active]="currentFilter === 'Forza Transportation'">Forza Transportation</li>
-            <li (click)="setFilter('Force One Transport')" [class.active]="currentFilter === 'Force One Transport'">Force One Transport</li>
-          </ul>
-          <ul class="sub-menu" *ngIf="currentFilter === 'Human Resources' || hrExpanded">
-            <li (click)="setFilter('Employee Management')" [class.active]="currentFilter === 'Employee Management'">Employee Management</li>
-            <li (click)="setFilter('Payroll')" [class.active]="currentFilter === 'Payroll'">Payroll</li>
-            <li (click)="setFilter('Performance Reviews')" [class.active]="currentFilter === 'Performance Reviews'">Performance Reviews</li>
-            <li (click)="setFilter('Recruiting')" [class.active]="currentFilter === 'Recruiting'">Recruiting</li>
-            <li (click)="setFilter('Training')" [class.active]="currentFilter === 'Training'">Training</li>
-          </ul>
+          <li (click)="setFilter('getting-started')" [class.active]="currentFilter === 'getting-started'" title="Getting Started">
+            <i class="nav-icon fas fa-rocket"></i>
+            <span class="nav-text">Getting Started</span>
+          </li>
+          
+          <li (click)="setFilter('Operations')" [class.active]="currentFilter === 'Operations'" title="Operations">
+            <i class="nav-icon fas fa-cogs"></i>
+            <span class="nav-text">Operations</span>
+          </li>
+          
+          <li (click)="setFilter('Finance')" [class.active]="currentFilter === 'Finance'" title="Finance">
+            <i class="nav-icon fas fa-chart-line"></i>
+            <span class="nav-text">Finance</span>
+          </li>
+          
+          <li (click)="setFilter('Accounting')" [class.active]="currentFilter === 'Accounting'" title="Accounting">
+            <i class="nav-icon fas fa-calculator"></i>
+            <span class="nav-text">Accounting</span>
+          </li>
+          
+          <!-- Workshop with submenu -->
+          <li class="has-submenu" [class.active]="currentFilter === 'Workshop'" [class.expanded]="workshopExpanded" title="Workshop">
+            <div class="nav-item-container">
+              <div class="nav-content" (click)="setFilter('Workshop')">
+                <i class="nav-icon fas fa-wrench"></i>
+                <span class="nav-text">Workshop</span>
+              </div>
+              <i class="submenu-arrow fas" [ngClass]="workshopExpanded ? 'fa-chevron-down' : 'fa-chevron-right'" *ngIf="!sidebarCollapsed" (click)="toggleWorkshopSubmenu(); $event.stopPropagation()"></i>
+            </div>
+            
+            <ul class="submenu" *ngIf="workshopExpanded && !sidebarCollapsed">
+              <li (click)="setFilter('Forza Transportation'); $event.stopPropagation()" [class.active]="currentFilter === 'Forza Transportation'">
+                <span class="nav-text">Forza Transportation 🇺🇸</span>
+              </li>
+              <li (click)="setFilter('Force One Transport'); $event.stopPropagation()" [class.active]="currentFilter === 'Force One Transport'">
+                <span class="nav-text">Force One Transport 🇲🇽</span>
+              </li>
+            </ul>
+          </li>
+          
+          <!-- Human Resources with submenu -->
+          <li class="has-submenu" [class.active]="currentFilter === 'Human Resources'" [class.expanded]="hrExpanded" title="Human Resources">
+            <div class="nav-item-container">
+              <div class="nav-content" (click)="setFilter('Human Resources')">
+                <i class="nav-icon fas fa-users"></i>
+                <span class="nav-text">Human Resources</span>
+              </div>
+              <i class="submenu-arrow fas" [ngClass]="hrExpanded ? 'fa-chevron-down' : 'fa-chevron-right'" *ngIf="!sidebarCollapsed" (click)="toggleHRSubmenu(); $event.stopPropagation()"></i>
+            </div>
+            
+            <ul class="submenu" *ngIf="hrExpanded && !sidebarCollapsed">
+              <li (click)="setFilter('Employee Management'); $event.stopPropagation()" [class.active]="currentFilter === 'Employee Management'">
+                <span class="nav-text">Employee Management</span>
+              </li>
+              <li (click)="setFilter('Payroll'); $event.stopPropagation()" [class.active]="currentFilter === 'Payroll'">
+                <span class="nav-text">Payroll</span>
+              </li>
+              <li (click)="setFilter('Performance Reviews'); $event.stopPropagation()" [class.active]="currentFilter === 'Performance Reviews'">
+                <span class="nav-text">Performance Reviews</span>
+              </li>
+              <li (click)="setFilter('Recruiting'); $event.stopPropagation()" [class.active]="currentFilter === 'Recruiting'">
+                <span class="nav-text">Recruiting</span>
+              </li>
+              <li (click)="setFilter('Training'); $event.stopPropagation()" [class.active]="currentFilter === 'Training'">
+                <span class="nav-text">Training</span>
+              </li>
+            </ul>
+          </li>
+          
+          <!-- Tires with submenu -->
+          <li class="has-submenu" [class.active]="currentFilter === 'Tires'" [class.expanded]="llantasExpanded" title="Tires">
+            <div class="nav-item-container">
+              <div class="nav-content" (click)="setFilter('Tires')">
+                <i class="nav-icon fas fa-circle"></i>
+                <span class="nav-text">Tires</span>
+              </div>
+              <i class="submenu-arrow fas" [ngClass]="llantasExpanded ? 'fa-chevron-down' : 'fa-chevron-right'" *ngIf="!sidebarCollapsed" (click)="toggleLlantasSubmenu(); $event.stopPropagation()"></i>
+            </div>
+            
+            <ul class="submenu" *ngIf="llantasExpanded && !sidebarCollapsed">
+              <li (click)="setFilter('Alignments'); $event.stopPropagation()" [class.active]="currentFilter === 'Alignments'">
+                <span class="nav-text">Alignments</span>
+              </li>
+            </ul>
+          </li>
+          
+          <li (click)="setFilter('Executive & Management')" [class.active]="currentFilter === 'Executive & Management'" title="Executive & Management">
+            <i class="nav-icon fas fa-user-tie"></i>
+            <span class="nav-text">Executive & Management</span>
+          </li>
         </ul>
       </nav>
       <div class="add-button-container">
         @if (isAdmin) {
-          <button (click)="showAddModal = true">+ Add Dashboard</button>
+          <button (click)="showAddModal = true">Add Dashboard</button>
         }
-        <button (click)="logout()" class="logout-btn">Logout</button>
       </div>
     </aside>
     <main class="content">
       <header class="content-header">
-        <h1>{{ currentFilter === 'getting-started' ? 'Getting Started' : currentFilter }}</h1>
-        <button class="request-dashboard-btn" (click)="showRequestModal = true">
-          📊 Request New Dashboard
-        </button>
+        @if (currentFilter === 'getting-started') {
+          <h1>Getting Started</h1>
+        } @else if (currentFilter === 'Forza Transportation') {
+          <h1>Forza Transportation Dashboards 🇺🇸</h1>
+        } @else if (currentFilter === 'Force One Transport') {
+          <h1>Force One Transport Dashboards 🇲🇽</h1>
+        } @else {
+          <h1>{{ currentFilter }}</h1>
+        }
+        <div class="header-actions">
+          <button class="request-dashboard-btn" (click)="showRequestModal = true">
+            Request New Dashboard 
+          </button>
+          <div class="profile-dropdown" (click)="toggleProfileDropdown(); $event.stopPropagation()">
+            <div class="profile-avatar">
+              <span class="avatar-text">{{ getUserInitials() }}</span>
+            </div>
+            <div class="profile-dropdown-content" [class.show]="showProfileDropdown" (click)="$event.stopPropagation()">
+              <div class="profile-info">
+                <div class="profile-avatar-large">
+                  <span class="avatar-text-large">{{ getUserInitials() }}</span>
+                </div>
+                <div class="profile-details">
+                  <div class="profile-name">
+                    {{ (currentUser?.first_name && currentUser?.last_name) 
+                       ? (currentUser.first_name + ' ' + currentUser.last_name) 
+                       : (currentUser?.username || 'User') }}
+                  </div>
+                  <div class="profile-email">{{ currentUser?.email || 'user@company.com' }}</div>
+                  <div class="profile-role">
+                    {{ currentUser?.position || (isAdmin ? 'Administrator' : 'User') }}
+                    @if (currentUser?.department) {
+                      <span class="department-badge">{{ currentUser.department }}</span>
+                    }
+                  </div>
+                </div>
+              </div>
+              
+              <hr class="dropdown-divider">
+              
+              <button class="dropdown-item" (click)="$event.stopPropagation()">
+                <i class="fas fa-user profile-icon"></i>
+                My Profile
+              </button>
+              
+              <button class="dropdown-item" (click)="$event.stopPropagation()">
+                <i class="fas fa-cog profile-icon"></i>
+                Settings
+              </button>
+              
+              <button class="dropdown-item" (click)="$event.stopPropagation()">
+                <i class="fas fa-question-circle profile-icon"></i>
+                Help & Support
+              </button>
+              
+              <hr class="dropdown-divider">
+              
+              <button class="dropdown-item logout-item" (click)="logout(); $event.stopPropagation()">
+                <i class="fas fa-sign-out-alt logout-icon"></i>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
       </header>
       @if (currentFilter === 'getting-started') {
         <div class="getting-started-content">
@@ -53,13 +191,18 @@
             <div class="section-header" (click)="toggleBiTeam()">
               <h2>Meet Your BI Team</h2>
               <button class="expand-btn" [class.expanded]="biTeamExpanded">
-                <span class="expand-icon">{{ biTeamExpanded ? '▼' : '▶' }}</span>
+                <i class="expand-icon" [ngClass]="biTeamExpanded ? 'fas fa-minus' : 'fas fa-plus'"></i>
+                <span class="expand-text">{{ biTeamExpanded ? 'Hide' : 'Show' }} Team</span>
               </button>
             </div>
             <p>Our dedicated Business Intelligence team is here to help you make data-driven decisions. Contact us for dashboard requests, training, or analytics support.</p>
             
             <div class="team-cards" *ngIf="biTeamExpanded">
               <div class="team-card">
+                <a href="https://wa.me/5218120729613?text=Hola%20Martin,%20tengo%20una%20consulta%20sobre%20Business%20Intelligence" 
+                   class="whatsapp-icon" target="_blank" rel="noopener noreferrer" title="Contactar a Martin por WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
                 <div class="team-photo">
                   <img src="/Martin.jpg" alt="Martin Alejandro Martinez Rodea" />
                 </div>
@@ -70,6 +213,10 @@
               </div>
               
               <div class="team-card">
+                <a href="https://wa.me/5218111066532?text=Hola%20Alan,%20tengo%20una%20consulta%20sobre%20Business%20Intelligence" 
+                   class="whatsapp-icon" target="_blank" rel="noopener noreferrer" title="Contactar a Alan por WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
                 <div class="team-photo">
                   <img src="/Alan.jpg" alt="Alan Saucedo Rodriguez" />
                 </div>
@@ -80,6 +227,10 @@
               </div>
               
               <div class="team-card">
+                <a href="https://wa.me/5218111055740?text=Hola%20Andrea,%20tengo%20una%20consulta%20sobre%20Business%20Intelligence" 
+                   class="whatsapp-icon" target="_blank" rel="noopener noreferrer" title="Contactar a Andrea por WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
                 <div class="team-photo">
                   <img src="/Andrea.png" alt="Andrea Sofia Lopez" />
                 </div>
@@ -90,6 +241,10 @@
               </div>
               
               <div class="team-card">
+                <a href="https://wa.me/5218111530308?text=Hola%20Andres,%20tengo%20una%20consulta%20sobre%20Business%20Intelligence" 
+                   class="whatsapp-icon" target="_blank" rel="noopener noreferrer" title="Contactar a Andres por WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
                 <div class="team-photo">
                   <img src="/Andres.jpg" alt="Andres Huguet Mack" />
                 </div>
@@ -100,6 +255,10 @@
               </div>
               
               <div class="team-card">
+                <a href="https://wa.me/5218114201718?text=Hola%20Angel,%20tengo%20una%20consulta%20sobre%20Business%20Intelligence" 
+                   class="whatsapp-icon" target="_blank" rel="noopener noreferrer" title="Contactar a Angel por WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>
                 <div class="team-photo">
                   <img src="/Miguel-Angel.jpg" alt="Miguel Angel Loera Guerrero" />
                 </div>
@@ -112,30 +271,61 @@
           </div>
           
           <div class="stats-section">
-            <h2>System Overview</h2>
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-number">{{ totalDashboards }}</div>
-                <div class="stat-label">Total Dashboards</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-number">{{ departments }}</div>
-                <div class="stat-label">Departments</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-number">{{ activeUsers }}</div>
-                <div class="stat-label">Active Users</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-number">{{ recentUpdates.length }}</div>
-                <div class="stat-label">Recent Updates</div>
-              </div>
+            <div class="section-header" (click)="toggleSystemOverview()">
+              <h2>System Overview</h2>
+              <i class="fas" [ngClass]="systemOverviewExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
             </div>
+            <p>Real-time statistics and performance metrics for the Forza Transportation Services BI Portal. Monitor active dashboards, user engagement, and system health.</p>
+            @if (systemOverviewExpanded) {
+              <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="stat-number">{{ totalDashboards || 0 }}</div>
+                <div class="stat-label">Active Dashboards</div>
+                <div class="stat-sublabel">Across all departments</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-building"></i></div>
+                <div class="stat-number">{{ departments || 0 }}</div>
+                <div class="stat-label">Departments</div>
+                <div class="stat-sublabel">Operations, Finance, Workshop</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-number">{{ activeUsers || 0 }}</div>
+                <div class="stat-label">Active Users</div>
+                <div class="stat-sublabel">Currently registered</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="stat-number">{{ recentUpdates?.length || 0 }}</div>
+                <div class="stat-label">Recent Updates</div>
+                <div class="stat-sublabel">Last 30 days</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-user-tie"></i></div>
+                <div class="stat-number">5</div>
+                <div class="stat-label">BI Team Members</div>
+                <div class="stat-sublabel">Available for support</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-database"></i></div>
+                <div class="stat-number">SQLite</div>
+                <div class="stat-label">Database Type</div>
+                <div class="stat-sublabel">Optimized performance</div>
+              </div>
+              </div>
+            }
           </div>
           
           <div class="recent-updates-section">
-            <h2>Recent Updates</h2>
-            <div class="updates-list">
+            <div class="section-header" (click)="toggleRecentUpdates()">
+              <h2>Recent Updates</h2>
+              <i class="fas" [ngClass]="recentUpdatesExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            <p>Stay informed about the latest dashboard additions and updates across all departments. Track new features and improvements to existing analytics.</p>
+            @if (recentUpdatesExpanded) {
+              <div class="updates-list">
               @if (recentUpdates.length > 0) {
                 @for (update of recentUpdates; track update.titulo) {
                   <div class="update-item">
@@ -149,12 +339,18 @@
                   <div class="update-content">No recent updates available</div>
                 </div>
               }
-            </div>
+              </div>
+            }
           </div>
           
           <div class="featured-dashboards-section">
-            <h2>Featured Dashboards</h2>
-            <div class="featured-grid">
+            <div class="section-header" (click)="toggleFeaturedDashboards()">
+              <h2>Featured Dashboards</h2>
+              <i class="fas" [ngClass]="featuredDashboardsExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            <p>Explore our most popular and impactful dashboards. These featured analytics provide key insights for strategic decision-making across all business units.</p>
+            @if (featuredDashboardsExpanded) {
+              <div class="featured-grid">
               @if (featuredDashboards.length > 0) {
                 @for (dashboard of featuredDashboards; track dashboard.id) {
                   <div class="featured-item">
@@ -170,14 +366,20 @@
                   <div class="featured-description">Add dashboards to see featured content here</div>
                 </div>
               }
-            </div>
+              </div>
+            }
           </div>
           
           <div class="training-resources-section">
-            <h2>Training Resources</h2>
-            <div class="resources-grid">
+            <div class="section-header" (click)="toggleTrainingResources()">
+              <h2>Training Resources</h2>
+              <i class="fas" [ngClass]="trainingResourcesExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            <p>Access comprehensive training materials to maximize your use of our BI platform. From basic navigation to advanced analytics techniques and best practices.</p>
+            @if (trainingResourcesExpanded) {
+              <div class="resources-grid">
               <div class="resource-item">
-                <div class="resource-icon">📊</div>
+                <div class="resource-icon"><i class="fas fa-chart-bar"></i></div>
                 <div class="resource-content">
                   <h3>Power BI Basics</h3>
                   <p>Learn the fundamentals of Power BI dashboard navigation</p>
@@ -185,7 +387,7 @@
                 </div>
               </div>
               <div class="resource-item">
-                <div class="resource-icon">📈</div>
+                <div class="resource-icon"><i class="fas fa-chart-line"></i></div>
                 <div class="resource-content">
                   <h3>Data Analysis Guide</h3>
                   <p>Understanding charts, filters, and data interpretation</p>
@@ -193,7 +395,7 @@
                 </div>
               </div>
               <div class="resource-item">
-                <div class="resource-icon">🎥</div>
+                <div class="resource-icon"><i class="fas fa-video"></i></div>
                 <div class="resource-content">
                   <h3>Video Tutorials</h3>
                   <p>Step-by-step video guides for common dashboard tasks</p>
@@ -201,19 +403,25 @@
                 </div>
               </div>
               <div class="resource-item">
-                <div class="resource-icon">📋</div>
+                <div class="resource-icon"><i class="fas fa-clipboard-list"></i></div>
                 <div class="resource-content">
                   <h3>Best Practices</h3>
                   <p>Tips for effective dashboard usage and data insights</p>
                   <a href="#" class="resource-link">Read More</a>
                 </div>
               </div>
-            </div>
+              </div>
+            }
           </div>
           
           <div class="quick-start-section">
-            <h2>Quick Start Guide</h2>
-            <div class="guide-steps">
+            <div class="section-header" (click)="toggleQuickStartGuide()">
+              <h2>Quick Start Guide</h2>
+              <i class="fas" [ngClass]="quickStartGuideExpanded ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+            </div>
+            <p>Get up and running quickly with our BI platform. Follow these simple steps to navigate dashboards, access reports, and request custom analytics.</p>
+            @if (quickStartGuideExpanded) {
+              <div class="guide-steps">
               <div class="step">
                 <h3>1. Navigate Departments</h3>
                 <p>Use the sidebar to browse dashboards by department (Operations, Finance, Workshop, etc.)</p>
@@ -226,10 +434,20 @@
                 <h3>3. Request New Dashboards</h3>
                 <p>Use the request form above to submit custom dashboard requirements</p>
               </div>
-            </div>
+              </div>
+            }
           </div>
         </div>
       } @else {
+        @if (currentFilter === 'Forza Transportation') {
+          <div class="category-description">
+            <p>Analytics and reports for US operations</p>
+          </div>
+        } @else if (currentFilter === 'Force One Transport') {
+          <div class="category-description">
+            <p>Analytics and reports for Mexico operations</p>
+          </div>
+        }
         <div class="gallery">
           @for (board of filteredDashboards; track board.id) {
             <app-dashboard-card 
@@ -245,66 +463,59 @@
   
   <!-- Request Dashboard Modal -->
   @if (showRequestModal) {
-    <div class="modal-overlay" (click)="showRequestModal = false">
-      <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-overlay" (click)="onRequestModalOverlayClick($event)">
+      <div class="modal-content request-dashboard-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
-          <h2>📊 Request New Dashboard</h2>
+          <h2>Request New Dashboard</h2>
           <button class="close-btn" (click)="showRequestModal = false">×</button>
         </div>
         
         <div class="modal-body">
-          <p class="modal-subtitle">Fill out the details below and we'll get back to you within 24 hours</p>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="dashboard-name">Dashboard Name</label>
-              <input type="text" id="dashboard-name" placeholder="Enter dashboard name" class="form-input">
-            </div>
-            <div class="form-group">
-              <label for="department">Department</label>
-              <select id="department" class="form-input">
-                <option value="">Select Department</option>
+          <div class="form-container-request">
+            <form>
+              <input 
+                type="text" 
+                id="dash-name" 
+                placeholder="Dashboard Name *"
+                required>
+              
+              <select id="dept-select" required>
+                <option value="">Select Department *</option>
                 <option value="Operations">Operations</option>
                 <option value="Finance">Finance</option>
                 <option value="Accounting">Accounting</option>
                 <option value="Workshop">Workshop</option>
                 <option value="Human Resources">Human Resources</option>
+                <option value="Tires">Tires</option>
                 <option value="Executive & Management">Executive & Management</option>
               </select>
-            </div>
-          </div>
-          
-          <div class="form-group form-full-width">
-            <label for="requirements">Requirements & Description</label>
-            <textarea id="requirements" placeholder="Describe your dashboard requirements, key metrics, data sources, and any specific features needed..." class="form-textarea"></textarea>
-          </div>
-          
-          <div class="priority-section">
-            <label>Priority Level</label>
-            <div class="priority-options">
-              <div class="priority-option">
-                <input type="radio" id="priority-low" name="priority" value="low">
-                <label for="priority-low" class="priority-label low">Low Priority</label>
+              
+              <textarea 
+                id="requirements-text" 
+                placeholder="Dashboard Requirements & Description *
+• Key metrics and KPIs to track
+• Data sources needed
+• Visualizations required
+• Target audience
+• Integration needs"
+                rows="6"
+                required></textarea>
+              
+              <select id="priority-level" required>
+                <option value="standard">Standard Priority (2-3 weeks)</option>
+                <option value="high">High Priority (1-2 weeks)</option>
+                <option value="urgent">Urgent (< 1 week)</option>
+              </select>
+              
+              <div class="form-buttons">
+                <button type="button" class="whatsapp-btn" (click)="submitDashboardRequest()">
+                  <i class="fab fa-whatsapp"></i>
+                  Send to WhatsApp
+                </button>
+                <button type="button" class="cancel-btn" (click)="showRequestModal = false">Cancel</button>
               </div>
-              <div class="priority-option">
-                <input type="radio" id="priority-medium" name="priority" value="medium" checked>
-                <label for="priority-medium" class="priority-label medium">Medium Priority</label>
-              </div>
-              <div class="priority-option">
-                <input type="radio" id="priority-high" name="priority" value="high">
-                <label for="priority-high" class="priority-label high">High Priority</label>
-              </div>
-            </div>
+            </form>
           </div>
-        </div>
-        
-        <div class="modal-footer">
-          <button class="cancel-btn" (click)="showRequestModal = false">Cancel</button>
-          <button class="submit-btn">Submit Request</button>
-          <p class="help-text">
-            <span class="help-icon">💡</span>
-            Our team will review your request and contact you for any clarifications needed
-          </p>
         </div>
       </div>
     </div>
@@ -312,7 +523,7 @@
   
   <!-- Add Dashboard Modal -->
   @if (showAddModal && isAdmin) {
-    <div class="modal-overlay" (click)="showAddModal = false">
+    <div class="modal-overlay" (click)="onModalOverlayClick($event)">
       <div class="modal-content add-dashboard-modal" (click)="$event.stopPropagation()">
         <div class="modal-header">
           <h2>+ Add New Dashboard</h2>
@@ -322,7 +533,8 @@
         <div class="modal-body">
           <app-add-dashboard-form 
             [dashboardToEdit]="dashboardToEdit"
-            (dashboardAdded)="onDashboardAdded()">
+            (dashboardAdded)="onDashboardAdded()"
+            (cancelled)="onDashboardFormCancelled()">
           </app-add-dashboard-form>
         </div>
       </div>
