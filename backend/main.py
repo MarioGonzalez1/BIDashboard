@@ -13,8 +13,10 @@ from sqlalchemy.orm import Session
 from database_config import get_db, DATABASE_INFO
 from database_adapter import adapter
 
-# Import the User model
+# Import the models
 User = adapter.User
+Dashboard = adapter.Dashboard
+Employee = adapter.Employee
 
 # --- CONFIGURACIÓN ---
 STATIC_DIR = "static"
@@ -232,7 +234,7 @@ async def create_tablero(
     with open(image_path, "wb") as buffer:
         buffer.write(await screenshot.read())
     
-    new_dashboard = Dashboard(
+    new_dashboard = adapter.Dashboard(
         titulo=titulo,
         url_acceso=url_acceso,
         categoria=categoria,
@@ -268,7 +270,7 @@ async def update_tablero(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    dashboard = db.query(Dashboard).filter(Dashboard.id == tablero_id).first()
+    dashboard = db.query(adapter.Dashboard).filter(adapter.Dashboard.id == tablero_id).first()
     if not dashboard:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -321,7 +323,7 @@ def delete_tablero(
     current_admin: User = Depends(get_current_admin_user),
     db: Session = Depends(get_db)
 ):
-    dashboard = db.query(Dashboard).filter(Dashboard.id == tablero_id).first()
+    dashboard = db.query(adapter.Dashboard).filter(adapter.Dashboard.id == tablero_id).first()
     if not dashboard:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
