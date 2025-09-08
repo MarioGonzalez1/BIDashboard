@@ -15,7 +15,7 @@ export class AddDashboardFormComponent implements OnChanges {
   @Input() dashboardToEdit: IDashboard | null = null;
   addForm: FormGroup;
   selectedFile: File | null = null;
-  categories = ['Operations', 'Finance', 'Accounting', 'Workshop', 'Human Resources', 'Tires', 'Executive & Management'];
+  categories = ['Operations', 'Finance', 'Workshop', 'Human Resources', 'Tires', 'Executive & Management'];
   subcategories: { [key: string]: string[] } = {
     'Workshop': ['Forza Transportation', 'Force One Transport'],
     'Human Resources': ['Employee Management', 'Payroll', 'Performance Reviews', 'Recruiting', 'Training'],
